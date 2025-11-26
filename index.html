@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Check Your Age</title>
+  <style>
+    :root {
+      --bg: #f6f0e6;
+      --text: #141313;
+      --card-bg: #ffffff;
+      --card-border: rgba(0, 0, 0, 0.08);
+      --accent: #111111;
+      --accent-soft: rgba(0, 0, 0, 0.08);
+      --input-bg: #fdf8f0;
+    }
+
+    body.dark {
+      --bg: #050505;
+      --text: #f7f2e8;
+      --card-bg: #111111;
+      --card-border: rgba(255, 255, 255, 0.1);
+      --accent: #f7f2e8;
+      --accent-soft: rgba(255, 255, 255, 0.08);
+      --input-bg: #181818;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: radial-gradient(circle at top, rgba(255,255,255,0.35), transparent 60%),
+                  var(--bg);
+      color: var(--text);
+      transition: background 0.4s ease, color 0.4s ease;
+    }
+
+    .wrapper {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+
+    .card {
+      position: relative;
+      background: var(--card-bg);
+      border-radius: 18px;
+      padding: 32px 40px 30px;
+      border: 1px solid var(--card-border);
+      box-shadow: 0 20px 60px rgba(0,0,0,0.25);
+      max-width: 420px;
+      width: 100%;
+      text-align: center;
+      transition: background 0.4s ease, border-color 0.4s ease, box-shadow 0.4s ease;
+    }
+
+    .card::before {
+      content: "";
+      position: absolute;
+      inset: -1px;
+      border-radius: 20px;
+      background: linear-gradient(135deg, rgba(255,255,255,0.1), rgba(0,0,0,0.35));
+      opacity: 0.35;
+      z-index: -1;
+    }
+
+    .subtitle-top {
+      font-size: 12px;
+      opacity: 0.7;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      margin-bottom: 6px;
+    }
+
+    h1 {
+      font-size: 26px;
+      margin: 0 0 4px;
+    }
+
+    .tagline {
+      font-size: 13px;
+      opacity: 0.8;
+      margin-bottom: 22px;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 8px;
+      font-size: 15px;
+    }
+
+    input[type="number"] {
+      width: 200px;
+      padding: 9px 11px;
+      font-size: 15px;
+      border-radius: 10px;
+      border: 1px solid var(--accent-soft);
+      background: var(--input-bg);
+      color: var(--text);
+      outline: none;
+      transition: border-color 0.25s ease, box-shadow 0.25s ease, background 0.25s ease;
+    }
+
+    input[type="number"]:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 2px var(--accent-soft);
+    }
+
+    button {
+      margin-top: 10px;
+      padding: 8px 22px;
+      font-size: 14px;
+      cursor: pointer;
+      border-radius: 999px;
+      border: 1px solid var(--accent);
+      background: var(--accent);
+      color: #fdfdfd;
+      font-weight: 500;
+      letter-spacing: 0.03em;
+      text-transform: uppercase;
+      transition: transform 0.15s ease, box-shadow 0.2s ease, background 0.25s ease, color 0.25s ease;
+    }
+
+    button:hover:not(:disabled) {
+      transform: translateY(-1px);
+      box-shadow: 0 10px 25px rgba(0,0,0,0.25);
+    }
+
+    button:active:not(:disabled) {
+      transform: translateY(0);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.25);
+    }
+
+    button:disabled {
+      opacity: 0.65;
+      cursor: default;
+      box-shadow: none;
+    }
+
+    .loader {
+      margin: 18px auto 6px;
+      width: 26px;
+      height: 26px;
+      border-radius: 50%;
+      border: 3px solid rgba(120,120,120,0.28);
+      border-top-color: var(--accent);
+      animation: spin 0.8s linear infinite;
+      display: none;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    .status-text {
+      margin-top: 4px;
+      font-size: 14px;
+      min-height: 20px;
+      opacity: 0.9;
+    }
+
+    .result {
+      margin-top: 22px;
+      font-size: 17px;
+    }
+
+    .result span {
+      font-weight: 700;
+    }
+
+    /* theme toggle button */
+    .theme-toggle {
+      position: absolute;
+      top: 12px;
+      right: 14px;
+      border-radius: 999px;
+      padding: 5px 10px;
+      font-size: 12px;
+      border: 1px solid var(--accent-soft);
+      background: rgba(0,0,0,0.03);
+      color: var(--text);
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      backdrop-filter: blur(10px);
+      transition: background 0.3s ease, border-color 0.3s ease, color 0.3s ease;
+    }
+
+    body.dark .theme-toggle {
+      background: rgba(255,255,255,0.03);
+    }
+
+    .theme-toggle span {
+      font-size: 14px;
+    }
+
+    .footer-note {
+      margin-top: 12px;
+      font-size: 11px;
+      opacity: 0.6;
+    }
+  </style>
+</head>
+<body>
+
+<div class="wrapper">
+  <div class="card">
+    <button class="theme-toggle" id="themeToggle" type="button">
+      <span id="themeIcon">🌙</span>
+    </button>
+
+    <div class="subtitle-top">Ekansh's Project</div>
+    <h1>Check Your Age</h1>
+    <div class="tagline">Ultra-advanced age detection system! </div>
+
+    <form id="ageForm">
+      <label for="ageInput">Enter your age:</label>
+      <input type="number" id="ageInput" min="0" required />
+      <br />
+      <button type="submit" id="submitBtn">Submit</button>
+    </form>
+
+    <div id="loader" class="loader"></div>
+    <div id="status" class="status-text"></div>
+    <div id="result" class="result"></div>
+
+    <div class="footer-note">
+      *Produced by Ekansh with 100% fake love.
+    </div>
+  </div>
+</div>
+
+<script>
+  const form = document.getElementById("ageForm");
+  const ageInput = document.getElementById("ageInput");
+  const submitBtn = document.getElementById("submitBtn");
+  const loader = document.getElementById("loader");
+  const status = document.getElementById("status");
+  const result = document.getElementById("result");
+  const themeToggle = document.getElementById("themeToggle");
+  const themeIcon = document.getElementById("themeIcon");
+
+  // Funny loading steps
+  const steps = [
+    "Connecting to NASA servers... 🛰️",
+    "Checking satellites... 📡",
+    "Decrypting Aadhaar database... 🔐",
+    "Scanning childhood photos... 👶",
+    "Calling backup AI... 🤖",
+    "Comparing with CBSE records... 📚",
+    "Asking your mom for confirmation... 😳",
+    "Almost done, don't panic... 😌",
+    "Finalizing OTP with God... 🙏"
+  ];
+
+  form.addEventListener("submit", function (e) {
+    e.preventDefault();
+
+    const age = ageInput.value.trim();
+    if (!age) return;
+
+    // reset view
+    result.textContent = "";
+    status.textContent = "";
+    loader.style.display = "block";
+    submitBtn.disabled = true;
+    ageInput.disabled = true;
+
+    let i = 0;
+
+    function showNextStep() {
+      if (i < steps.length) {
+        status.textContent = steps[i];
+        i++;
+        setTimeout(showNextStep, 900); // 0.9 sec each to feel snappy
+      } else {
+        loader.style.display = "none";
+        status.textContent = "";
+        result.innerHTML = `Your age is: <span>${age}</span>`;
+        submitBtn.disabled = false;
+        ageInput.disabled = false;
+      }
+    }
+
+    showNextStep();
+  });
+
+  // THEME TOGGLE
+  function applyTheme(theme) {
+    if (theme === "dark") {
+      document.body.classList.add("dark");
+      themeIcon.textContent = "☀️";
+    } else {
+      document.body.classList.remove("dark");
+      themeIcon.textContent = "🌙";
+    }
+    localStorage.setItem("ageCheckerTheme", theme);
+  }
+
+  themeToggle.addEventListener("click", () => {
+    const isDark = document.body.classList.contains("dark");
+    applyTheme(isDark ? "light" : "dark");
+  });
+
+  // load saved theme (if any)
+  const savedTheme = localStorage.getItem("ageCheckerTheme") || "dark";
+  applyTheme(savedTheme);
+</script>
+
+</body>
+</html>
